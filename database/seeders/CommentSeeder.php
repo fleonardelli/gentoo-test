@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Services\WordCombinatorService;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Services\Abbreviator\AbbreviatorInterface;
+use App\Services\WordCombinator\WordCombinatorInterface;
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
 use Illuminate\Support\Facades\DB;
 
 class CommentSeeder extends Seeder
 {
     public function __construct(
-        private readonly WordCombinatorService $wordCombinationService
+        private readonly WordCombinatorInterface $wordCombinationService,
+        private readonly AbbreviatorInterface $abbreviator,
     ) {
     }
 
@@ -45,7 +45,7 @@ class CommentSeeder extends Seeder
                 }
 
                 $postId = $posts->random();
-                $abbreviation = $this->wordCombinationService->generateAbbreviation($content);
+                $abbreviation = $this->abbreviator->generateAbbreviation($content);
                 $comments[] = [
                     'post_id' => $postId,
                     'content' => $content,
