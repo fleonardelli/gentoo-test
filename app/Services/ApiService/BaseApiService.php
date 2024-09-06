@@ -17,6 +17,17 @@ use Illuminate\Database\Eloquent\Builder;
 
 abstract readonly class BaseApiService implements ApiServiceInterface
 {
+
+    /*
+     * NOTE: This class has a lot of logic that should be tested.
+     * I've added some unit tests in order to show how I work with them.
+     *
+     * I would've added a test for this, but it is a bit tricky to test classes
+     * that uses Template Method pattern. It is a useful pattern, but for cleaner
+     * and easily testable code, composition would be better. Don't get me wrong,
+     * it is testable, but it takes more effort and maybe needs some "hacks". 
+     */
+
     abstract protected function getFilterableFields(): array;
     abstract protected function getSortableFields(): array;
 
