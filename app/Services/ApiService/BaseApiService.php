@@ -44,6 +44,7 @@ abstract readonly class BaseApiService implements ApiServiceInterface
         $this->applyRelations($query, $relations);
 
         $totalCount = $query->count();
+        // this can also be done with eloquent pagination
         $items = $query->paginate($pagination->getLimit(), ['*'], 'page', $pagination->getPage());
 
         return new PaginatedResult(

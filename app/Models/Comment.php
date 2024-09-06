@@ -17,6 +17,8 @@ use Illuminate\Support\Carbon;
  */
 class Comment extends Model
 {
+    use HasFactory;
+
     /**
      * @var string
      */
