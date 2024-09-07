@@ -13,68 +13,59 @@ use PHPUnit\Framework\TestCase;
 
 final class QueryParamsTest extends TestCase
 {
-    public function test_query_params_with_all_fields(): void
+    /**
+     * @dataProvider queryParamsProvider
+     */
+    public function test_query_params(array $inputParams, Pagination $expectedPagination, Sorting $expectedSorting, Filtering $expectedFiltering, Relations $expectedRelations): void
     {
-        // Arrange
-        $queryParams = [
-            'page' => 2,
-            'limit' => 20,
-            'sort' => 'title',
-            'direction' => 'desc',
-            'status' => 'active',
-            'author' => 'John Doe',
-            'with' => 'comments,tags',
-        ];
-
         // Act
-        $queryParamsObject = new QueryParams($queryParams);
+        $queryParamsObject = new QueryParams($inputParams);
 
         // Assert
-        $this->assertEquals(new Pagination(2, 20), $queryParamsObject->getPaginationParams());
-        $this->assertEquals(new Sorting('title', 'desc'), $queryParamsObject->getSorting());
-        $this->assertEquals(
-            new Filtering([
-                'status' => 'active',
-                'author' => 'John Doe'
-            ]),
-            $queryParamsObject->getFiltering()
-        );
-        $this->assertEquals(new Relations(['comments', 'tags']), $queryParamsObject->getRelations());
+        $this->assertEquals($expectedPagination, $queryParamsObject->getPaginationParams());
+        $this->assertEquals($expectedSorting, $queryParamsObject->getSorting());
+        $this->assertEquals($expectedFiltering, $queryParamsObject->getFiltering());
+        $this->assertEquals($expectedRelations, $queryParamsObject->getRelations());
     }
 
-    public function test_query_params_with_default_values(): void
+    public static function queryParamsProvider(): array
     {
-        // Arrange
-        $queryParams = [];
-
-        // Act
-        $queryParamsObject = new QueryParams($queryParams);
-
-        // Assert
-        $this->assertEquals(new Pagination(1, 10), $queryParamsObject->getPaginationParams());
-        $this->assertEquals(new Sorting('created_at', 'asc'), $queryParamsObject->getSorting());
-        $this->assertEquals(new Filtering([]), $queryParamsObject->getFiltering());
-        $this->assertEquals(new Relations([]), $queryParamsObject->getRelations());
-    }
-
-    public function test_query_params_with_missing_fields(): void
-    {
-        // Arrange
-        $queryParams = [
-            'page' => 3,
-            'limit' => 15,
-            'sort' => 'updated_at',
-            'direction' => 'asc',
-            'with' => 'authors',
+        return [
+            'all fields provided' => [
+                [
+                    'page' => 2,
+                    'limit' => 20,
+                    'sort' => 'title',
+                    'direction' => 'desc',
+                    'status' => 'active',
+                    'author' => 'John Doe',
+                    'with' => 'comments,tags',
+                ],
+                new Pagination(2, 20),
+                new Sorting('title', 'desc'),
+                new Filtering(['status' => 'active', 'author' => 'John Doe']),
+                new Relations(['comments', 'tags']),
+            ],
+            'default values' => [
+                [],
+                new Pagination(1, 10),
+                new Sorting('created_at', 'asc'),
+                new Filtering([]),
+                new Relations([]),
+            ],
+            'missing fields' => [
+                [
+                    'page' => 3,
+                    'limit' => 15,
+                    'sort' => 'updated_at',
+                    'direction' => 'asc',
+                    'with' => 'authors',
+                ],
+                new Pagination(3, 15),
+                new Sorting('updated_at', 'asc'),
+                new Filtering([]),
+                new Relations(['authors']),
+            ],
         ];
-
-        // Act
-        $queryParamsObject = new QueryParams($queryParams);
-
-        // Assert
-        $this->assertEquals(new Pagination(3, 15), $queryParamsObject->getPaginationParams());
-        $this->assertEquals(new Sorting('updated_at', 'asc'), $queryParamsObject->getSorting());
-        $this->assertEquals(new Filtering([]), $queryParamsObject->getFiltering());
-        $this->assertEquals(new Relations(['authors']), $queryParamsObject->getRelations());
     }
 }
